@@ -3,7 +3,7 @@ import { isAdminAuthHeader } from "@/lib/auth";
 
 // /admin je zaštićen HTTP Basic Auth-om (ADMIN_USER / ADMIN_PASSWORD iz .env).
 // Ako lozinka nije podešena, admin je potpuno zaključan.
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   if (!process.env.ADMIN_USER || !process.env.ADMIN_PASSWORD) {
     return new NextResponse("Admin nije podešen (ADMIN_USER / ADMIN_PASSWORD).", { status: 503 });
   }

@@ -1,4 +1,4 @@
-// HTTP Basic Auth za admin. Koristi se i u middleware-u (Edge) i u server akcijama,
+// HTTP Basic Auth za admin. Koristi se i u proxy.ts i u server akcijama,
 // jer se server akcije mogu pozvati POST-om na bilo koju rutu, ne samo na /admin.
 
 export function isAdminAuthHeader(header: string | null): boolean {

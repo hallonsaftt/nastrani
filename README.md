@@ -10,7 +10,7 @@ cp .env.example .env.local   # podesi ADMIN_USER / ADMIN_PASSWORD
 npm run dev                  # http://localhost:3000
 ```
 
-Zahteva Node 22.5+ (koristi ugrađeni `node:sqlite`). Baza je `data/nastrani.db` i pravi se sama pri prvom pokretanju,
+Zahteva Node 22.13+ (koristi ugrađeni `node:sqlite`). Baza je `data/nastrani.db` i pravi se sama pri prvom pokretanju,
 sa **izmišljenim** demo podacima (`lib/seed.ts`). Pre objavljivanja obriši `data/nastrani.db` i izmeni/isprazni seed.
 
 ## Stranice
