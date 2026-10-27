@@ -25,3 +25,11 @@ sa **izmišljenim** demo podacima (`lib/seed.ts`). Pre objavljivanja obriši `da
 ## Model podataka (`lib/db.ts`)
 
 `parties` · `persons` (status `draft`/`published` — javno se vide samo objavljeni) · `connections` (osoba ↔ stranka, tip, period, **obavezan izvor**) · `timeline` · `requests`.
+
+## Hosting
+
+Baza je SQLite fajl, pa za **trajne** podatke hosting mora imati trajni disk (Railway/Render sa volume-om, VPS).
+Podesi `DATABASE_PATH` na putanju na tom disku, plus `ADMIN_USER` i `ADMIN_PASSWORD`.
+
+Na Vercel/Netlify projektni folder je samo za čitanje: sajt tada radi iz privremene baze u `/tmp`
+(sa demo podacima), ali se zahtevi i izmene iz admina **gube** pri svakom restartu ili novom deploy-u.

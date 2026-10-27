@@ -1,5 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { seed } from "./seed";
 
@@ -78,12 +79,38 @@ declare global {
   var __nastraniDb: DatabaseSync | undefined;
 }
 
-export function db(): DatabaseSync {
-  if (!globalThis.__nastraniDb) {
-    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-    const d = new DatabaseSync(DB_PATH);
+function tryOpen(file: string): DatabaseSync | null {
+  try {
+    if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
+    const d = new DatabaseSync(file);
     d.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
     d.exec(SCHEMA);
+    return d;
+  } catch (err) {
+    console.error(`[db] Ne mogu da otvorim bazu ${file}:`, (err as Error).message);
+    return null;
+  }
+}
+
+// Na hostingu bez upisa na disk (Vercel, Netlify…) projektni folder je samo za čitanje.
+// Tada sajt ipak radi iz privremenog foldera, ali se izmene gube pri restartu servera —
+// za trajne podatke podesi DATABASE_PATH na trajni disk.
+function openDatabase(): DatabaseSync {
+  const fallback = path.join(os.tmpdir(), "nastrani.db");
+  for (const file of [DB_PATH, fallback, ":memory:"]) {
+    const d = tryOpen(file);
+    if (!d) continue;
+    if (file !== DB_PATH) {
+      console.warn(`[db] Koristim privremenu bazu (${file}). Podaci NISU trajni.`);
+    }
+    return d;
+  }
+  throw new Error("Baza nije dostupna.");
+}
+
+export function db(): DatabaseSync {
+  if (!globalThis.__nastraniDb) {
+    const d = openDatabase();
     const { n } = d.prepare("SELECT COUNT(*) AS n FROM parties").get() as { n: number };
     if (n === 0) seed(d);
     globalThis.__nastraniDb = d;
